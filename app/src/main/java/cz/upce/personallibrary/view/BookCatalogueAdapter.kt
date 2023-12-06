@@ -3,6 +3,7 @@ package cz.upce.personallibrary.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,19 +12,34 @@ import cz.upce.personallibrary.model.Book
 
 class BookCatalogueAdapter(private var books: List<Book>) : RecyclerView.Adapter<BookCatalogueAdapter.BookViewHolder>() {
 
+    private var onItemClicked: ((Book) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Book) -> Unit) {
+        this.onItemClicked = listener
+    }
+
+    val values: List<Book>
+        get() = this.books;
+
     class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleView: TextView = itemView.findViewById(R.id.textViewTitle)
         private val authorView: TextView = itemView.findViewById(R.id.textViewAuthor)
         private val yearView: TextView = itemView.findViewById(R.id.textViewPublicationYear)
         private val genreView: TextView = itemView.findViewById(R.id.textViewGenre)
-        private val ratingView: TextView = itemView.findViewById(R.id.textViewRating)
+        private val ratingView: RatingBar = itemView.findViewById(R.id.bookRatingBar)
 
-        fun bind(book: Book) {
+        fun bind(book: Book, onItemClickListener: ((Book) -> Unit)?) {
             titleView.text = book.title
             authorView.text = book.author
             yearView.text = book.publicationYear.toString()
             genreView.text = book.genre
-            ratingView.text = book.personalRating.toString()
+            ratingView.numStars = book.personalRating.value
+
+            onItemClickListener?.let {
+                itemView.setOnClickListener {
+                    it(book)
+                }
+            }
         }
     }
 
@@ -50,7 +66,7 @@ class BookCatalogueAdapter(private var books: List<Book>) : RecyclerView.Adapter
     override fun getItemCount(): Int = books.size
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        holder.bind(books[position])
+        holder.bind(books[position], onItemClicked)
     }
 
     fun updateBooks(newBooks: List<Book>) {

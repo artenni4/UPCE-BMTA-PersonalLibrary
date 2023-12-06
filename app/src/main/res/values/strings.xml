@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">PersonalLibrary</string>
-    <string name="book_title">Title</string>
-    <string name="book_author">Author</string>
-    <string name="publication_year">Year</string>
+    <string name="book_title">Název</string>
+    <string name="book_author">Autor</string>
+    <string name="publication_year">Rok</string>
     <string name="book_genre">Genre</string>
+    <string name="save">Uložit</string>
+    <string name="personal_rating">Vlastní hodnocení</string>
 </resources>
