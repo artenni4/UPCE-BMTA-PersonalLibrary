@@ -14,4 +14,6 @@
     <string name="undo">Vrátit</string>
     <string name="search">Hledat</string>
     <string name="new_book">Nová kniha</string>
+    <string name="edit_book">Úprava knihy</string>
+    <string name="add_testing_data">Přidat testovací data</string>
 </resources>

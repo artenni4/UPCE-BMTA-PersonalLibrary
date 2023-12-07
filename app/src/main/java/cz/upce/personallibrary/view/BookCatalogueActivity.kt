@@ -17,9 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import cz.upce.personallibrary.R
 import cz.upce.personallibrary.databinding.ActivityBookCatalogueBinding
+import cz.upce.personallibrary.model.Book
+import cz.upce.personallibrary.model.BookRating
 import cz.upce.personallibrary.repository.BookRepository
 import cz.upce.personallibrary.repository.dao.BooksDatabase
 import cz.upce.personallibrary.viewmodel.BookCatalogueViewModel
+import java.time.Year
 
 class BookCatalogueActivity : AppCompatActivity() {
     private lateinit var viewModel: BookCatalogueViewModel
@@ -50,35 +53,48 @@ class BookCatalogueActivity : AppCompatActivity() {
     }
 
     private fun initTopBar() {
-        val menuItem = binding.topAppBar.menu.findItem(R.id.action_search)
-        val searchView = menuItem.actionView as SearchView
+        binding.topAppBar.menu.findItem(R.id.action_search).let { menuItem ->
+            val searchView = menuItem.actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    viewModel.setSearch(searchView.query.toString())
+                    return true
+                }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.setSearch(searchView.query.toString())
-                return true
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                    searchHandler.postDelayed(Runnable {
+                        viewModel.setSearch(newText ?: "")
+                    }.also { searchRunnable = it }, 400)
+
+                    return true
+                }
+            })
+
+            menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    return true
+                }
+
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                    viewModel.setSearch("")
+                    return true
+                }
+            })
+        }
+
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.testing_data_action) {
+                viewModel.addBook(Book(0, "Book1", "Author1", Year.of(2000), "Genre1", BookRating(4.0f)))
+                viewModel.addBook(Book(0, "Book1 Part 2", "Author3", Year.of(2004), "Genre1", BookRating(5.0f)))
+                viewModel.addBook(Book(0, "Book2", "Author1", Year.of(2001), "Genre2", BookRating(1.0f)))
+                viewModel.addBook(Book(0, "Book3", "Author2", Year.of(2002), "Genre2", BookRating(5.0f)))
+                viewModel.addBook(Book(0, "Book4", "Author3", Year.of(2004), "Genre3", BookRating(3.0f)))
+                return@setOnMenuItemClickListener true
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                searchHandler.postDelayed(Runnable {
-                    viewModel.setSearch(newText ?: "")
-                }.also { searchRunnable = it }, 400)
-
-                return true
-            }
-        })
-
-        menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                viewModel.setSearch("")
-                return true
-            }
-        })
+            return@setOnMenuItemClickListener false
+        }
     }
 
     private fun initViewModel() {

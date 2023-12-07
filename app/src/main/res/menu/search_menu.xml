@@ -5,6 +5,11 @@
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search"
         android:title="@string/search"
-        app:showAsAction="ifRoom|collapseActionView"
+        app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item
+        android:id="@+id/testing_data_action"
+        android:title="@string/add_testing_data"
+        app:showAsAction="never" />
 </menu>

@@ -24,6 +24,10 @@ class AddEditBookActivity : AppCompatActivity() {
 
         if (bookValues != null) {
             updateViewValues(bookValues)
+            binding.topAppBar.title = getString(R.string.edit_book)
+        }
+        else {
+            binding.topAppBar.title = getString(R.string.new_book)
         }
 
         binding.buttonSave.setOnClickListener {
@@ -40,6 +44,10 @@ class AddEditBookActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             }
+        }
+
+        binding.topAppBar.setNavigationOnClickListener {
+            finish()
         }
     }
 
