@@ -1,8 +1,10 @@
 package cz.upce.personallibrary.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import cz.upce.personallibrary.model.Book
 import cz.upce.personallibrary.repository.BookRepository
@@ -18,23 +20,34 @@ class BookCatalogueViewModel(private val repository: BookRepository) : ViewModel
         }
     }
 
-    val allBooks: LiveData<List<Book>> = repository.allBooks
+    private val currentQuery = MutableLiveData<String>()
+    val books: LiveData<List<Book>> = currentQuery.switchMap { query ->
+        repository.searchBooks("%$query%")
+    }
 
-    fun addBook(book: Book) {
-        viewModelScope.launch {
+    private var deletedBook: Book? = null
+
+    fun setSearch(searchQuery: String) {
+        currentQuery.value = searchQuery;
+    }
+
+    fun addBook(book: Book) = viewModelScope.launch {
+        repository.insert(book)
+    }
+
+    fun deleteBook(book: Book) = viewModelScope.launch {
+        repository.delete(book)
+        deletedBook = book
+    }
+
+    fun editBook(book: Book) = viewModelScope.launch {
+        repository.update(book)
+    }
+
+    fun restoreBook() = viewModelScope.launch {
+        deletedBook?.let { book ->
             repository.insert(book)
-        }
-    }
-
-    fun deleteBook(book: Book) {
-        viewModelScope.launch {
-            repository.delete(book)
-        }
-    }
-
-    fun editBook(book: Book) {
-        viewModelScope.launch {
-            repository.update(book)
+            deletedBook = null
         }
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PersonalLibrary</string>
+    <string name="app_name">Osobní knihovna</string>
     <string name="book_title">Název</string>
     <string name="book_author">Autor</string>
     <string name="publication_year">Rok</string>
@@ -10,4 +10,8 @@
     <string name="genre_is_required">Žánr je povinné pole</string>
     <string name="publication_year_is_required">Datum vydání je povinné pole</string>
     <string name="author_is_required">Autor je povinné pole</string>
+    <string name="book_deleted">Kniha byla odebrana z kolekce</string>
+    <string name="undo">Vrátit</string>
+    <string name="search">Hledat</string>
+    <string name="new_book">Nová kniha</string>
 </resources>

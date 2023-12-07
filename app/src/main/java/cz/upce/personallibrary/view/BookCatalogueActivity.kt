@@ -4,12 +4,18 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import cz.upce.personallibrary.R
 import cz.upce.personallibrary.databinding.ActivityBookCatalogueBinding
 import cz.upce.personallibrary.repository.BookRepository
 import cz.upce.personallibrary.repository.dao.BooksDatabase
@@ -24,6 +30,10 @@ class BookCatalogueActivity : AppCompatActivity() {
     private lateinit var addBookResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var editBookResultLauncher: ActivityResultLauncher<Intent>
 
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookCatalogueBinding.inflate(layoutInflater)
@@ -31,11 +41,44 @@ class BookCatalogueActivity : AppCompatActivity() {
 
         initViewModel()
         initResultLaunchers()
-        initRecyclerViewAdapter()
+        initRecyclerView()
+        initTopBar()
 
         initAddBookAction()
         setDeleteOnSwipe()
         setEditOnTap()
+    }
+
+    private fun initTopBar() {
+        val menuItem = binding.topAppBar.menu.findItem(R.id.action_search)
+        val searchView = menuItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.setSearch(searchView.query.toString())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                searchHandler.postDelayed(Runnable {
+                    viewModel.setSearch(newText ?: "")
+                }.also { searchRunnable = it }, 400)
+
+                return true
+            }
+        })
+
+        menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                viewModel.setSearch("")
+                return true
+            }
+        })
     }
 
     private fun initViewModel() {
@@ -46,30 +89,37 @@ class BookCatalogueActivity : AppCompatActivity() {
 
     private fun initResultLaunchers() {
         addBookResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.parcelable<AddEditBookActivity.BookValues>(AddEditBookActivity.BOOK_VALUES)?.let {
-                    viewModel.addBook(it.toBook())
-                }
+            if (result.resultCode != Activity.RESULT_OK) {
+                return@registerForActivityResult
+            }
+
+            result.data?.parcelable<AddEditBookActivity.BookValues>(AddEditBookActivity.BOOK_VALUES)?.let { bookValues ->
+                val book = bookValues.toBook()
+                viewModel.addBook(book)
             }
         }
 
         editBookResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.parcelable<AddEditBookActivity.BookValues>(AddEditBookActivity.BOOK_VALUES)?.let {
-                    viewModel.editBook(it.toBook())
+                result.data?.let { data ->
+                    data.parcelable<AddEditBookActivity.BookValues>(AddEditBookActivity.BOOK_VALUES)?.let { bookValues ->
+                        viewModel.editBook(bookValues.toBook())
+                    }
                 }
             }
         }
     }
 
-    private fun initRecyclerViewAdapter() {
-        adapter = BookCatalogueAdapter(viewModel.allBooks.value ?: listOf())
+    private fun initRecyclerView() {
+        adapter = BookCatalogueAdapter(viewModel.books.value ?: listOf())
         binding.booksRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.booksRecyclerView.adapter = adapter
+        binding.booksRecyclerView.addItemDecoration(MarginItemDecoration(resources.getDimensionPixelSize(R.dimen.margin)))
 
-        viewModel.allBooks.observe(this) { books ->
+        viewModel.books.observe(this) { books ->
             adapter.updateBooks(books)
         }
+        viewModel.setSearch("")
     }
 
     private fun setDeleteOnSwipe() {
@@ -82,17 +132,26 @@ class BookCatalogueActivity : AppCompatActivity() {
                 val position = viewHolder.adapterPosition
                 val book = adapter.values[position]
                 viewModel.deleteBook(book)
+
+                showUndoSnackbar()
             }
         }
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.booksRecyclerView)
     }
 
-    private fun setEditOnTap() {
-        adapter.setOnItemClickListener {
-            val intent = Intent(this, AddEditBookActivity::class.java)
-                .putExtra(AddEditBookActivity.BOOK_VALUES, AddEditBookActivity.BookValues.fromBook(it))
+    fun showUndoSnackbar() {
+        Snackbar.make(binding.booksRecyclerView, R.string.book_deleted, Snackbar.LENGTH_LONG)
+            .setAction(R.string.undo) {
+                viewModel.restoreBook()
+            }.show()
+    }
 
-            addBookResultLauncher.launch(intent)
+    private fun setEditOnTap() {
+        adapter.setOnItemClickListener { book ->
+            val intent = Intent(this, AddEditBookActivity::class.java)
+                .putExtra(AddEditBookActivity.BOOK_VALUES, AddEditBookActivity.BookValues.fromBook(book))
+
+            editBookResultLauncher.launch(intent)
         }
     }
 

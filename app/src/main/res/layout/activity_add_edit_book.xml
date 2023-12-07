@@ -8,36 +8,56 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <EditText
-            android:id="@+id/editTextTitle"
+        
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_title"
-            android:inputType="textCapWords"/>
+            android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/editTextAuthor"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/book_title"
+                android:inputType="textCapWords"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_author"
-            android:inputType="textPersonName"/>
+            android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/editTextPublicationYear"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/book_author"
+                android:inputType="textPersonName"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/publication_year"
-            android:inputType="number"/>
+            android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/editTextGenre"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPublicationYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/publication_year"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_genre"
-            android:inputType="textCapWords"/>
+            android:layout_height="match_parent">
 
-        <TextView
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextGenre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/book_genre"
+                android:inputType="textCapWords"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/personal_rating"
@@ -51,12 +71,12 @@
             android:numStars="5"
             android:stepSize="1.0"/>
 
-        <!-- Button to submit the changes -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/save"
+            style="@style/Widget.Material3.Button"
             android:layout_marginTop="16dp"/>
     </LinearLayout>
 </ScrollView>

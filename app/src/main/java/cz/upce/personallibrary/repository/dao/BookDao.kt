@@ -18,7 +18,7 @@ interface BookDao {
     @Delete
     suspend fun delete(book: DbBook)
 
-    @Query("SELECT * FROM books")
-    fun getAllBooks(): LiveData<List<DbBook>>
+    @Query("SELECT * FROM books WHERE title LIKE :searchQuery OR author LIKE :searchQuery")
+    fun searchBooks(searchQuery: String): LiveData<List<DbBook>>
 }
 

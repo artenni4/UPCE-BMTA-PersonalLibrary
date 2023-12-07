@@ -7,7 +7,7 @@ import cz.upce.personallibrary.repository.dao.BookDao
 import cz.upce.personallibrary.repository.dao.DbBook
 
 class BookRepository(private val bookDao: BookDao) {
-    val allBooks: LiveData<List<Book>> = bookDao.getAllBooks().map {
+    fun searchBooks(searchQuery: String): LiveData<List<Book>> = bookDao.searchBooks(searchQuery).map {
         dbBookList -> dbBookList.map { it.toBook() }
     }
 
