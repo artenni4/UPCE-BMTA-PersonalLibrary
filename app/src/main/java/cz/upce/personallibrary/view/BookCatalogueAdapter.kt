@@ -33,7 +33,7 @@ class BookCatalogueAdapter(private var books: List<Book>) : RecyclerView.Adapter
             authorView.text = book.author
             yearView.text = book.publicationYear.toString()
             genreView.text = book.genre
-            ratingView.numStars = book.personalRating.value
+            ratingView.rating = book.personalRating.value
 
             onItemClickListener?.let {
                 itemView.setOnClickListener {

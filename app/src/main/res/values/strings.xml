@@ -3,7 +3,11 @@
     <string name="book_title">Název</string>
     <string name="book_author">Autor</string>
     <string name="publication_year">Rok</string>
-    <string name="book_genre">Genre</string>
+    <string name="book_genre">Žánr</string>
     <string name="save">Uložit</string>
     <string name="personal_rating">Vlastní hodnocení</string>
+    <string name="title_is_required">Název je povinné pole</string>
+    <string name="genre_is_required">Žánr je povinné pole</string>
+    <string name="publication_year_is_required">Datum vydání je povinné pole</string>
+    <string name="author_is_required">Autor je povinné pole</string>
 </resources>

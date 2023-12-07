@@ -13,7 +13,7 @@ data class DbBook(
     val author: String,
     val publicationYear: Int,
     val genre: String,
-    val personalRating: Int
+    val personalRating: Float
 ) {
     fun toBook() = Book(id, title, author, Year.of(publicationYear), genre, BookRating(personalRating))
 
