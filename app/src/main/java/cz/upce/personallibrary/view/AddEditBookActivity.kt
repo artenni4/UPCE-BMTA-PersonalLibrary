@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcelable
+import android.widget.Toast
 import cz.upce.personallibrary.R
 import cz.upce.personallibrary.databinding.ActivityAddEditBookBinding
 import cz.upce.personallibrary.model.Book
@@ -76,6 +77,10 @@ class AddEditBookActivity : AppCompatActivity() {
         if (binding.editTextAuthor.text.toString().isBlank()) {
             binding.editTextAuthor.error = getString(R.string.author_is_required)
             isValid = false
+        }
+        if (binding.personalRatingBar.rating < 1.0f) {
+            Toast.makeText(this, R.string.rating_required, Toast.LENGTH_SHORT).show();
+            isValid = false;
         }
 
         return isValid
